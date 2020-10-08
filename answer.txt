@@ -1,0 +1,230 @@
+1. Use the ‘docker build’ command to build an image and run ‘app1.js’. Ensure it is built successfully by doing ‘docker image ls’. Now run it and ensure it works by accessing http://localhost:3000.
+
+docker build -t app1 .
+
+docker run app1
+
+image ls
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+app1                      1.0                 9118d7d51cfb        8 minutes ago       942MB
+
+2. Now write a Dockerfile for ‘app2.js’ using the Dockerfile for ‘app1.js’ as a starting point. The provided Dockerfile copies files to the root directory of the image. Modify it to copy application files to the ‘/app’ directory within the image
+
+FROM node:latest
+
+COPY . /app/
+
+EXPOSE 3000
+
+CMD [ "node", "./app/app2.js" ]
+
+3. ‘app2.js’ can be passed two arguments, ‘message’ and ‘colour’ as environment variables. Show how you can set the message and colour variables when running this docker image (without changing the code given.)
+
+docker build -t app2 .
+
+docker run -p 127.0.0.1:3000:3000 --env message=HelloWorld --env colour=Blue app2
+
+Server listening on port 3000
+
+4. ‘app3.js’ requires the modules in package.json to be installed. Use the ‘npm’ command to install the necessary modules when building the image. You can set the same environment variables as app2.js to change the message and background colour at run time like ‘app2.js’.
+
+Docker file
+
+FROM node:alpine
+
+COPY . /app/
+
+WORKDIR /app
+RUN npm install
+
+EXPOSE 3000
+
+CMD [ "node","/app/app3.js" ]
+
+
+docker build -t app3 .
+Sending build context to Docker daemon  2.065MB
+Step 1/6 : FROM node:alpine
+ ---> 72eea7c426fc
+Step 2/6 : COPY . /app/
+ ---> aa8480de1898
+Step 3/6 : WORKDIR /app
+ ---> Running in 509575fc4564
+Removing intermediate container 509575fc4564
+ ---> 921e1db7b61a
+Step 4/6 : RUN npm install
+ ---> Running in 034b6b23111f
+npm WARN app3@1.0.0 No repository field.
+
+audited 50 packages in 1.604s
+found 0 vulnerabilities
+
+Removing intermediate container 034b6b23111f
+ ---> e96d222a86dd
+Step 5/6 : EXPOSE 3000
+ ---> Running in c7702a7c6b92
+Removing intermediate container c7702a7c6b92
+ ---> 5597ed0f092e
+Step 6/6 : CMD [ "node","/app/app3.js" ]
+ ---> Running in 44277ca86f4e
+Removing intermediate container 44277ca86f4e
+ ---> 657f277a0cba
+Successfully built 657f277a0cba
+Successfully tagged app3:latest
+
+docker run -p 127.0.0.1:3000:3000 --env message=HelloWorld --env colour=Blue app3
+
+Example app listening at http://localhost:3000
+
+5. Write a Dockerfile for ‘app4.js’ installing the required modules. Run the image and upload a file. Verify that the file was uploaded by visiting http://localhost:3000/upload/filename (e.g. http://localhost:3000/upload/photo.jpg.)
+
+Docker file
+
+FROM node:alpine
+
+COPY . /app/
+
+WORKDIR /app
+
+RUN npm install
+
+EXPOSE 3000
+
+CMD [ "node","/app/app4.js" ]
+
+docker build -t app4 .
+Sending build context to Docker daemon  2.013MB
+Step 1/6 : FROM node:alpine
+ ---> 72eea7c426fc
+Step 2/6 : COPY . /app/
+ ---> 15facd03afe7
+Step 3/6 : WORKDIR /app
+ ---> Running in 704fdb25ae34
+Removing intermediate container 704fdb25ae34
+ ---> 7ae3c8fb35e5
+Step 4/6 : RUN npm install
+ ---> Running in e8095d085ba0
+npm WARN app4@1.0.0 No repository field.
+
+audited 50 packages in 1.618s
+found 0 vulnerabilities
+
+Removing intermediate container e8095d085ba0
+ ---> 43ee9148ddae
+Step 5/6 : EXPOSE 3000
+ ---> Running in e761f9c8db4b
+Removing intermediate container e761f9c8db4b
+ ---> 12dd2836978e
+Step 6/6 : CMD [ "node","/app/app4.js" ]
+ ---> Running in b9d7a311e6f6
+Removing intermediate container b9d7a311e6f6
+ ---> 6d5fbbffd225
+Successfully built 6d5fbbffd225
+Successfully tagged app4:latest
+
+docker run -p 127.0.0.1:3000:3000 -d app4
+2bc67c2051db454d855b1d107093f581b766663999794476fa6201bc66f9528e
+
+6. Stop the container you ran in (5) and remove the stopped container using the ‘docker container rm’ command. Now start a new container of the ‘app4.js’ image. Try to access the file you uploaded in (5.) Explain the reason why the file is not accessible.
+
+The files created inside a container are stored in a writable container layer. This data doesnt persist when the cotainer is removed. And the data in a writable layes cant move from the process into another.
+
+7. Create a volume to hold uploads using ‘docker volume create’. Now show how ‘app4.js’ can be run with the volume mounted. Verify the that the uploaded files are available after the container is removed and a new one is started (with the volume mounted.)
+
+
+docker volume create app4_upload
+
+app4_upload
+
+docker run -p 127.0.0.1:3000:3000 -v app4_upload:/app/app4_upload -d app4
+
+d2ab642d58833ef8f9436bdfbf530602f4db8ad30fc2add0b1298b832d2456bc
+
+8. Create an account on Docker Hub. Upload the image you created for ‘app4.js’ to Docker Hub and provide a URL to your image.
+
+docker login --username=gayal1996
+Password:
+Login Succeeded
+
+docker image ls
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+app4                      latest              d7b1713acfba        37 minutes ago      121MB
+yasiru-app4               latest              88a25f45a154        43 minutes ago      123MB
+<none>                    <none>              a172a7d022d6        45 minutes ago      121MB
+<none>                    <none>              6d5fbbffd225        About an hour ago   119MB
+<none>                    <none>              9abc99d01079        About an hour ago   117MB
+app3                      latest              657f277a0cba        About an hour ago   119MB
+<none>                    <none>              2ce2fff04312        About an hour ago   117MB
+<none>                    <none>              89945a288ee9        About an hour ago   117MB
+<none>                    <none>              fc6c66574c3e        About an hour ago   117MB
+<none>                    <none>              e8c94e3f83de        About an hour ago   117MB
+pisaapp3                  latest              940eb2f33ee9        About an hour ago   120MB
+<none>                    <none>              e078895c253e        About an hour ago   117MB
+<none>                    <none>              9576c45fe4c4        About an hour ago   117MB
+<none>                    <none>              8288b6bac0e4        About an hour ago   117MB
+<none>                    <none>              13c3e21f536d        About an hour ago   117MB
+<none>                    <none>              ad694f6555c1        About an hour ago   942MB
+app2                      latest              52f1e14cc094        2 hours ago         942MB
+<none>                    <none>              14b6a727032a        2 hours ago         117MB
+<none>                    <none>              99e42df3386b        11 hours ago        942MB
+<none>                    <none>              eed029ae78fb        11 hours ago        942MB
+<none>                    <none>              d6321a9d9798        11 hours ago        942MB
+<none>                    <none>              7ed937bde723        11 hours ago        942MB
+<none>                    <none>              310643d27add        12 hours ago        942MB
+<none>                    <none>              aab3b40dcbf0        12 hours ago        942MB
+<none>                    <none>              bc735163217d        12 hours ago        942MB
+<none>                    <none>              8cff4f67f920        12 hours ago        942MB
+<none>                    <none>              f60afbec9e55        12 hours ago        942MB
+<none>                    <none>              cc2d40e20601        12 hours ago        942MB
+<none>                    <none>              fea3c2e4ba9e        12 hours ago        942MB
+<none>                    <none>              5333c88226fa        13 hours ago        165MB
+<none>                    <none>              3a1fe2da6527        13 hours ago        942MB
+<none>                    <none>              4cb5b6f86bea        13 hours ago        942MB
+<none>                    <none>              e54abc18865f        13 hours ago        942MB
+<none>                    <none>              64ccaa5f6525        13 hours ago        942MB
+<none>                    <none>              2fbe1a3f0141        13 hours ago        942MB
+<none>                    <none>              dd70f2bdd093        13 hours ago        942MB
+<none>                    <none>              1b4dbb4ccc80        13 hours ago        942MB
+<none>                    <none>              04bbff4c82ba        13 hours ago        942MB
+<none>                    <none>              af8d6e2518f5        13 hours ago        942MB
+<none>                    <none>              2c8fb2143594        13 hours ago        942MB
+<none>                    <none>              843a8fcd3d88        13 hours ago        942MB
+<none>                    <none>              af40497930d8        13 hours ago        942MB
+<none>                    <none>              2ae61f183c2c        13 hours ago        942MB
+<none>                    <none>              842fce4979e8        13 hours ago        942MB
+<none>                    <none>              c844722f0867        14 hours ago        942MB
+<none>                    <none>              857c86abfd14        14 hours ago        942MB
+<none>                    <none>              33e98893ed42        14 hours ago        942MB
+<none>                    <none>              52dfcef414df        14 hours ago        942MB
+<none>                    <none>              4fbad30526fb        14 hours ago        942MB
+<none>                    <none>              b7f5fa0290d4        14 hours ago        942MB
+<none>                    <none>              c440c4be6c26        14 hours ago        942MB
+<none>                    <none>              4b3d1c55d286        14 hours ago        942MB
+app1                      1.0                 9118d7d51cfb        14 hours ago        942MB
+app1                      latest              9118d7d51cfb        14 hours ago        942MB
+<none>                    <none>              f8f34438feb1        17 hours ago        942MB
+node                      alpine              72eea7c426fc        36 hours ago        117MB
+node                      slim                8ec3841e41bb        36 hours ago        165MB
+node                      latest              91a3cf793116        36 hours ago        942MB
+gayal1996/bulletinboard   1.0                 ccae7fe4dd1f        2 weeks ago         192MB
+gordon/bulletinboard      1.0                 ccae7fe4dd1f        2 weeks ago         192MB
+bulletinboard             1.0                 ccae7fe4dd1f        2 weeks ago         192MB
+node                      current-slim        8d32307afb40        3 weeks ago         165MB
+nginx                     latest              602e111c06b6        4 weeks ago         127MB
+hello-world               latest              bf756fb1ae65        4 months ago        
+
+docker tag d7b1713acfba  gayal1996/app4:v1
+docker push gayal1996/app4
+The push refers to repository [docker.io/gayal1996/app4]
+a24efdb9e426: Pushed
+a367878ca65a: Pushed
+846843578a94: Mounted from library/node
+333d276b2ed4: Mounted from library/node
+e4c8c61d9c2a: Mounted from library/node
+3e207b409db3: Mounted from library/node
+v1: digest: sha256:6e82a97465532e532c8d3008301a0a6ca2f261fad4228b9ffec228406619a9f5 size: 1576
+
+
+
+
+

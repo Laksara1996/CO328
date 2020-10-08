@@ -1,0 +1,58 @@
+
+1.Explain what is meant by a docker image and container.
+
+A Docker image is an unchangeable file that contains the source code, libraries, dependencies, tools, and other files needed for an application to run.
+Due to their read-only quality, these images are sometimes referred to as snapshots. They represent an application and its virtual environment at a specific point in time. This consistency is one of the great features of Docker. It allows developers to test and experiment software in stable, uniform conditions.
+
+A Docker container is a virtualized run-time environment where users can isolate applications from the underlying system. These containers are compact, portable units in which you can start up an application quickly and easily.
+
+3.What is the purpose of the ‘TAG’ column?
+
+It is basically the version of the respect image
+
+4.Where is the docker image downloaded from when you execute the command above?
+
+C:\ProgramData\DockerDesktop\vm-data
+
+6.Visit http://localhost:8080 in your browser. What do you observe in the docker console?
+
+b4f3660072ab8ec37b5f6a4e5cfe894b16cbbf7433ad3f85fdba3ed867298f4a
+
+7.Explain what the -p option in the docker run command in (5) does.
+
+asks Docker to forward traffic incoming on the host’s port 8000, to the container’s port 8080. Containers have their own private set of ports, so if you want to reach one from the network, you have to forward traffic to it in this way. Otherwise, firewall rules will prevent all network traffic from reaching your container, as a default security posture.
+
+8.Open a new terminal, run the following command and note down the container name shown in the last column.
+
+nervous_shaw
+
+10.What is the effect of the -a switch to the docker ps command?
+
+Show all containers (default shows just running)
+
+11.How do you list the logs of a stopped container?
+
+docker container logs -f nervous_shaw
+
+12.How do you restart the nginx container that was stopped in (9)?
+
+docker restart nervous_shaw
+
+13.How do you delete the nginx docker image?
+
+First have to stop the container
+And then run
+-:docker rm nervous_shaw
+
+14.What happens if you try to delete the image of a running container?
+
+An error message pop up
+
+Error response from daemon: You cannot remove a running container b4f3660072ab8ec37b5f6a4e5cfe894b16cbbf7433ad3f85fdba3ed867298f4a. Stop the container before attempting removal or force remove
+
+
+
+
+
+
+
